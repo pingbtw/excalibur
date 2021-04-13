@@ -1,5 +1,6 @@
 package me.ping.bot;
 
+import me.ping.bot.commands.Mute;
 import me.ping.bot.commands.Ping;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -9,7 +10,9 @@ public class Bot {
     {
         String token = "";
         JDA api = JDABuilder.createDefault(token)
-                .addEventListeners(new Ping())
+                .addEventListeners(
+                        new Ping(),
+                        new Mute())
                 .build();
     }
 }
