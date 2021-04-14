@@ -1,5 +1,6 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.StringUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -22,7 +23,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme ")) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-remindme")) {
             handleRemindMeCmd(event);
         }
     }
