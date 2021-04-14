@@ -68,7 +68,7 @@ public class Points extends ListenerAdapter {
 
                 connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
 
-                String sql = "INSERT INTO main.points (server_id, user_id, points) VALUES(?,?,?)";
+                String sql = "INSERT INTO points (server_id, user_id, points) VALUES(?,?,?)";
 
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 stmt.setLong(1, serverId);
@@ -85,7 +85,7 @@ public class Points extends ListenerAdapter {
     }
 
     public int calculatePointsToAward(MessageReceivedEvent event) {
-        int points = 0;
+        int points = 1;
         TextChannel channel = event.getTextChannel();
         if (channel.getParent().getName().equalsIgnoreCase("serverstuff")) {
             points += 1;
