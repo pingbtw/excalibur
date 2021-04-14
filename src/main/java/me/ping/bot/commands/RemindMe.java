@@ -35,8 +35,8 @@ public class RemindMe extends ListenerAdapter {
         Long uid = event.getAuthor().getIdLong();
         long channelId = event.getChannel().getIdLong();
         long serverId = event.getGuild().getIdLong();
-        String reminder = msg.getContentRaw().substring("-remindme ".length());
-
+        String reminder = StringUtils.removePrefix(msg.getContentRaw(), "-remindme ");
+        
         try {
             userCommandTime = new UserCommandTime(reminder);
         } catch (
