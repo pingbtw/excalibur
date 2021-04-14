@@ -26,7 +26,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-remindme")) {
+        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme ")) {
             handleRemindMeCmd(event);
         }
     }
@@ -36,7 +36,7 @@ public class RemindMe extends ListenerAdapter {
         Long uid = event.getAuthor().getIdLong();
         long channelId = event.getChannel().getIdLong();
         long serverId = event.getGuild().getIdLong();
-        String reminder = StringUtils.removePrefix(msg.getContentRaw(), "-remindme ");
+        String reminder = msg.getContentRaw().substring("-remindme ".length());
 
         try {
             userCommandTime = new UserCommandTime(reminder);
