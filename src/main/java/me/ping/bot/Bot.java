@@ -19,7 +19,7 @@ public class Bot {
     }
 
     private JDA prepareJDA() {
-        String token = "";
+        String token = "fake_token";
         JDA api;
         try {
             api = JDABuilder.createDefault(token)
