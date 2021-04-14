@@ -1,6 +1,26 @@
 package me.ping.bot.core;
 
 public class StringUtils {
+    public static String removePrefix(final String text, String prefix) {
+        if (isEmpty(text)) {
+            return "";
+        }
+        if (prefix == null) {
+            return text;
+        }
+        int textLength = text.length();
+        int prefixLength = prefix.length();
+
+        if (prefixLength == 0) {
+            return text;
+        }
+        if (prefixLength > textLength) {
+            return null;
+        }
+
+        return text.substring(prefix.length());
+    }
+
     public static boolean startsWithIgnoreCase(final String text, final String prefix) {
         if (isEmpty(text)) {
             return false;
