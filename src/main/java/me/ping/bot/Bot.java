@@ -27,7 +27,8 @@ public class Bot {
                             new Mute(),
                             new Nuke(),
                             new RemindMe(),
-                            new Pfp()
+                            new Pfp(),
+                            new Pin()
                     )
                     .build();
             return api;
