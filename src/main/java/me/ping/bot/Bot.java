@@ -3,6 +3,7 @@ package me.ping.bot;
 import io.github.cdimascio.dotenv.Dotenv;
 import me.ping.bot.commands.*;
 import me.ping.bot.core.Heartbeat;
+import me.ping.bot.listeners.Points;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
@@ -28,7 +29,8 @@ public class Bot {
                             new Nuke(),
                             new RemindMe(),
                             new Pfp(),
-                            new Pin()
+                            new Pin(),
+                            new Points()
                     )
                     .build();
             return api;
@@ -46,6 +48,8 @@ public class Bot {
             connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS points (id INTEGER PRIMARY KEY, server_id INTEGER, user_id INTEGER, points INTEGER)");
+            connection.commit();
         }
         catch(SQLException e)
         {
