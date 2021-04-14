@@ -1,20 +1,69 @@
 package me.ping.bot;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import me.ping.bot.commands.Mute;
 import me.ping.bot.commands.Nuke;
 import me.ping.bot.commands.Ping;
+import me.ping.bot.commands.RemindMe;
+import me.ping.bot.core.Heartbeat;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
+import java.sql.*;
+
 public class Bot {
-    public static void main(String[] arguments) throws Exception
-    {
-        String token = "";
-        JDA api = JDABuilder.createDefault(token)
-                .addEventListeners(
-                        new Ping(),
-                        new Mute(),
-                        new Nuke())
-                .build();
+    public static void main(String[] args) throws Exception {
+        Bot bot = new Bot();
+        JDA jda = bot.prepareJDA();
+        bot.prepareDatabase();
+
+        new Heartbeat(jda);
+    }
+
+    private JDA prepareJDA() {
+        String token = "ODMxODA2MzY4ODM4MTg5MDg2.YHamDA.3fhEu04suOqbhD3Pcsw-T2NMJH8";
+        JDA api;
+        try {
+            api = JDABuilder.createDefault(token)
+                    .addEventListeners(
+                            new Ping(),
+                            new Mute(),
+                            new Nuke(),
+                            new RemindMe()
+                    )
+                    .build();
+            return api;
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return null;
+    }
+    // this wont create anything if it exists already
+    private void prepareDatabase() {
+        Connection connection = null;
+        try
+        {
+            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
+        }
+        catch(SQLException e)
+        {
+            System.err.println(e.getMessage());
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                System.err.println(e.getMessage());
+            }
+        }
     }
 }
