@@ -1,6 +1,8 @@
 package me.ping.bot.commands;
 
+import com.sun.tools.javac.util.StringUtils;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -16,13 +18,16 @@ public class Nuke extends ListenerAdapter {
         Message msg = event.getMessage();
         Guild guild = event.getGuild();
         MessageChannel channel = event.getChannel();
-        if (msg.getContentRaw().toLowerCase().startsWith("-nuke")) {
-            String[] numberToNuke = msg.getContentRaw().split("\\s+");
-            System.out.println(numberToNuke);
-            List<Message> messages = channel.getHistory().retrievePast(Integer.parseInt(numberToNuke[1])).complete();
-            for (Message message : messages) {
-                channel.deleteMessageById(message.getIdLong()).queue();
+        Member member;
 
+        if (msg.getContentRaw().toLowerCase().startsWith("-nuke")) {
+            if (msg.getAuthor().getId().equals("")) {
+                String[] numberToNuke = msg.getContentRaw().split("\\s+");
+                System.out.println(numberToNuke);
+                List<Message> messages = channel.getHistory().retrievePast(Integer.parseInt(numberToNuke[1])).complete();
+                channel.purgeMessages(messages);
+            } else {
+                channel.sendMessage("You aren't ping").queue();
             }
         }
     }

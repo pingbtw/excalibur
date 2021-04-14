@@ -1,5 +1,6 @@
 package me.ping.bot.commands;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -31,9 +32,15 @@ public class RemindMe extends ListenerAdapter {
         Long uid            = event.getAuthor().getIdLong();
         long channelId      = event.getChannel().getIdLong();
         long serverId       = event.getGuild().getIdLong();
+        String time;
 
         String reminder     = msg.getContentRaw().replace("-remindme ", "");
-        String time         = reminder.substring(0, reminder.indexOf(" "));
+        try {
+            time         = reminder.substring(0, reminder.indexOf(" "));
+        } catch (StringIndexOutOfBoundsException e) {
+            event.getChannel().sendMessage("Empty reminder body").queue();
+            return;
+        }
         reminder            = reminder.replace(time, "").trim();
         String unitStr      = getTimeUnit(time);
         String durationStr  = null;
