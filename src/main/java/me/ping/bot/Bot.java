@@ -1,5 +1,6 @@
 package me.ping.bot;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import me.ping.bot.commands.*;
 import me.ping.bot.core.Heartbeat;
 import me.ping.bot.listeners.Points;
@@ -18,7 +19,7 @@ public class Bot {
     }
 
     private JDA prepareJDA() {
-        String token = "fake_token";
+        String token = "ODMxODA2MzY4ODM4MTg5MDg2.YHamDA.kVyiDDWHQScgQ2LXGDMp3Rid6sU";
         JDA api;
         try {
             api = JDABuilder.createDefault(token)
