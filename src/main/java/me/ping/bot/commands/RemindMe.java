@@ -17,6 +17,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RemindMe extends ListenerAdapter {
+    private final long DAYS_LIMIT = 30L;
+    protected String[] units = {"s", "m", "h", "d"};
     private Connection connection;
     private UserCommandTime userCommandTime;
 
@@ -24,7 +26,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme ")) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-remindme")) {
             handleRemindMeCmd(event);
         }
     }
