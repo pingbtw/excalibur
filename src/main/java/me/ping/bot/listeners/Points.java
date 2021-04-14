@@ -38,7 +38,7 @@ public class Points extends ListenerAdapter {
         return points;
     }
 
-        public void insertIntoPointsTable(MessageReceivedEvent event) {
+    public void insertIntoPointsTable(MessageReceivedEvent event) {
         Connection connection;
         long serverId = event.getGuild().getIdLong();
         long userId = event.getAuthor().getIdLong();

@@ -15,9 +15,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RemindMe extends ListenerAdapter {
-    private Connection connection;
     private final long DAYS_LIMIT = 30L;
     protected String[] units = {"s", "m", "h", "d"};
+    private Connection connection;
 
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
@@ -29,23 +29,23 @@ public class RemindMe extends ListenerAdapter {
     }
 
     private void handleRemindMeCmd(MessageReceivedEvent event) {
-        Message msg         = event.getMessage();
-        Long uid            = event.getAuthor().getIdLong();
-        long channelId      = event.getChannel().getIdLong();
-        long serverId       = event.getGuild().getIdLong();
+        Message msg = event.getMessage();
+        Long uid = event.getAuthor().getIdLong();
+        long channelId = event.getChannel().getIdLong();
+        long serverId = event.getGuild().getIdLong();
         String time;
 
-        String reminder     = msg.getContentRaw().replace("-remindme ", "");
+        String reminder = msg.getContentRaw().replace("-remindme ", "");
         try {
-            time         = reminder.substring(0, reminder.indexOf(" "));
+            time = reminder.substring(0, reminder.indexOf(" "));
         } catch (StringIndexOutOfBoundsException e) {
             event.getChannel().sendMessage("Empty reminder body").queue();
             return;
         }
-        reminder            = reminder.replace(time, "").trim();
-        String unitStr      = getTimeUnit(time);
-        String durationStr  = null;
-        long duration       = 0;
+        reminder = reminder.replace(time, "").trim();
+        String unitStr = getTimeUnit(time);
+        String durationStr = null;
+        long duration = 0;
 
         if (unitStr != null) {
             durationStr = time.replace(unitStr, "");
@@ -86,9 +86,9 @@ public class RemindMe extends ListenerAdapter {
     private TimeUnit strToTimeUnit(String unit) {
         return (
                 unit.equalsIgnoreCase("s") ? TimeUnit.SECONDS :
-                unit.equalsIgnoreCase("m") ? TimeUnit.MINUTES :
-                unit.equalsIgnoreCase("h") ? TimeUnit.HOURS :
-                unit.equalsIgnoreCase("d") ? TimeUnit.DAYS : null);
+                        unit.equalsIgnoreCase("m") ? TimeUnit.MINUTES :
+                                unit.equalsIgnoreCase("h") ? TimeUnit.HOURS :
+                                        unit.equalsIgnoreCase("d") ? TimeUnit.DAYS : null);
     }
 
     private boolean validateTimeLimitations(Long duration, TimeUnit unit) {

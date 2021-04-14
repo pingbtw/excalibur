@@ -34,36 +34,29 @@ public class Bot {
                     )
                     .build();
             return api;
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
         return null;
     }
+
     // this wont create anything if it exists already
     private void prepareDatabase() {
         Connection connection = null;
-        try
-        {
+        try {
             connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
             Statement statement = connection.createStatement();
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS points (id INTEGER PRIMARY KEY, server_id INTEGER, user_id INTEGER, points INTEGER)");
             connection.commit();
-        }
-        catch(SQLException e)
-        {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                if(connection != null)
+        } finally {
+            try {
+                if (connection != null)
                     connection.close();
-            }
-            catch(SQLException e)
-            {
+            } catch (SQLException e) {
                 // connection close failed.
                 System.err.println(e.getMessage());
             }
