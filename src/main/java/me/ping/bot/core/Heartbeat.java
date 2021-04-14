@@ -82,11 +82,11 @@ public class Heartbeat implements Runnable {
             jda.getGuildById(serverId)
                     .getTextChannelById(channelId)
                     .sendMessage("Reminder: " + jda
-                            .getUserById(userId)
-                            .getAsMention() +
+                            .retrieveUserById(userId).complete().getAsMention() +
                             " - " +
                             reminder).queue();
         } catch (Exception e) {
+            System.out.println(e);
             System.out.println("---EXCEPTION---");
             System.out.println("Something went wrong while trying to dispatch this reminder");
             /*

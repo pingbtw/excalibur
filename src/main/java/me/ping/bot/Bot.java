@@ -1,10 +1,7 @@
 package me.ping.bot;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import me.ping.bot.commands.Mute;
-import me.ping.bot.commands.Nuke;
-import me.ping.bot.commands.Ping;
-import me.ping.bot.commands.RemindMe;
+import me.ping.bot.commands.*;
 import me.ping.bot.core.Heartbeat;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -50,7 +47,7 @@ public class Bot {
         }
         catch(SQLException e)
         {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         finally
         {
