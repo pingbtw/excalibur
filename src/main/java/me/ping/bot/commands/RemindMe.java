@@ -1,5 +1,8 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.UserCommandTime;
+import me.ping.bot.exceptions.InvalidTimeDurationException;
+import me.ping.bot.exceptions.InvalidTimeUnitException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -15,8 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RemindMe extends ListenerAdapter {
     private Connection connection;
-    private final long DAYS_LIMIT = 30L;
-    protected String[] units = {"s", "m", "h", "d"};
+    private UserCommandTime userCommandTime;
 
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
@@ -28,88 +30,37 @@ public class RemindMe extends ListenerAdapter {
     }
 
     private void handleRemindMeCmd(MessageReceivedEvent event) {
-        Message msg         = event.getMessage();
-        Long uid            = event.getAuthor().getIdLong();
-        long channelId      = event.getChannel().getIdLong();
-        long serverId       = event.getGuild().getIdLong();
-        String time;
-
-        String reminder     = msg.getContentRaw().replace("-remindme ", "");
-        try {
-            time         = reminder.substring(0, reminder.indexOf(" "));
-        } catch (StringIndexOutOfBoundsException e) {
-            event.getChannel().sendMessage("Empty reminder body").queue();
-            return;
-        }
-        reminder            = reminder.replace(time, "").trim();
-        String unitStr      = getTimeUnit(time);
-        String durationStr  = null;
-        long duration       = 0;
-
-        if (unitStr != null) {
-            durationStr = time.replace(unitStr, "");
-        } else {
-            returnError(event.getChannel(), "Invalid time unit provided.");
-            return;
-        }
+        Message msg = event.getMessage();
+        Long uid = event.getAuthor().getIdLong();
+        long channelId = event.getChannel().getIdLong();
+        long serverId = event.getGuild().getIdLong();
+        String reminder = msg.getContentRaw().substring("-remindme ".length());
 
         try {
-            duration = Long.parseLong(durationStr);
-        } catch (NumberFormatException e) {
-            returnError(event.getChannel(), "Invalid duration provided.");
+            userCommandTime = new UserCommandTime(reminder);
+        } catch (
+                InvalidTimeDurationException |
+                InvalidTimeUnitException |
+                StringIndexOutOfBoundsException e) {
+            returnError(event.getChannel(), e.getMessage());
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
             return;
         }
 
-        if (validateTimeLimitations(duration, strToTimeUnit(unitStr))) {
-            setReminder(serverId, channelId, uid, reminder, duration, strToTimeUnit(unitStr));
+        reminder = reminder.replace(userCommandTime.getTimeStr(), "").trim();
+
+        if (userCommandTime.validateTimeLimitations()) {
+            setReminder(serverId, channelId, uid, reminder, userCommandTime.getDuration(), userCommandTime.getUnit());
             event.getChannel().sendMessage(event.getAuthor().getAsMention() + ", your reminder is set").queue();
         } else {
-            event.getChannel().sendMessage(String.format("Reminder duration cannot exceed %d days", DAYS_LIMIT)).queue();
+            event.getChannel().sendMessage(String.format("Reminder duration cannot exceed %d days", UserCommandTime.DAYS_LIMIT)).queue();
         }
     }
 
     private void returnError(MessageChannel channel, String message) {
         channel.sendMessage(message + "\nUsage: -remindme <5s|m|h|d> <message to be reminded of>").queue();
-    }
-
-    private String getTimeUnit(String time) {
-        String unit = Character.toString(time.charAt(time.length() - 1));
-        boolean contains = Arrays.stream(units).anyMatch(unit::equalsIgnoreCase);
-
-        if (contains) {
-            return unit;
-        }
-        return null;
-    }
-
-    private TimeUnit strToTimeUnit(String unit) {
-        return (
-                unit.equalsIgnoreCase("s") ? TimeUnit.SECONDS :
-                unit.equalsIgnoreCase("m") ? TimeUnit.MINUTES :
-                unit.equalsIgnoreCase("h") ? TimeUnit.HOURS :
-                unit.equalsIgnoreCase("d") ? TimeUnit.DAYS : null);
-    }
-
-    private boolean validateTimeLimitations(Long duration, TimeUnit unit) {
-        switch (unit) {
-            case SECONDS:
-                if (duration > (DAYS_LIMIT * 60L * 60L * 24L))
-                    return false;
-                break;
-            case MINUTES:
-                if (duration > (DAYS_LIMIT * 60L * 24L))
-                    return false;
-                break;
-            case HOURS:
-                if (duration > (DAYS_LIMIT * 24L))
-                    return false;
-                break;
-            case DAYS:
-                if (duration > DAYS_LIMIT)
-                    return false;
-                break;
-        }
-        return true;
     }
 
     private void setReminder(
