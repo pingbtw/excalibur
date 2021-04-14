@@ -13,11 +13,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.Date;
 
 public class Heartbeat implements Runnable {
-    private JDA jda;
-    private Connection connection;
-
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
+    private JDA jda;
+    private Connection connection;
 
 
     public Heartbeat(JDA jda) {

@@ -15,17 +15,17 @@ public class Pin extends ListenerAdapter {
         TextChannel channel = event.getTextChannel();
 
         if (msg.getContentRaw().toLowerCase().startsWith("-pin ")) {
-                String[] parsedMessage = msg.getContentRaw().split("\\s+");
-                try {
-                    List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
-                    if (pinnedMesages.size() != 50) {
-                        channel.pinMessageById(channel.retrieveMessageById(parsedMessage[1]).complete().getIdLong()).queue();
-                    } else {
-                        channel.sendMessage("There are already 50 pins!").queue();
-                    }
-                } catch (Exception e) {
-                    channel.sendMessage("Something went wrong").queue();
+            String[] parsedMessage = msg.getContentRaw().split("\\s+");
+            try {
+                List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
+                if (pinnedMesages.size() != 50) {
+                    channel.pinMessageById(channel.retrieveMessageById(parsedMessage[1]).complete().getIdLong()).queue();
+                } else {
+                    channel.sendMessage("There are already 50 pins!").queue();
                 }
+            } catch (Exception e) {
+                channel.sendMessage("Something went wrong").queue();
+            }
 
         }
     }
