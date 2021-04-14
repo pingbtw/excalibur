@@ -21,7 +21,7 @@ public class Bot {
     }
 
     private JDA prepareJDA() {
-        String token = "ODMxODA2MzY4ODM4MTg5MDg2.YHamDA.3fhEu04suOqbhD3Pcsw-T2NMJH8";
+        String token = "";
         JDA api;
         try {
             api = JDABuilder.createDefault(token)
