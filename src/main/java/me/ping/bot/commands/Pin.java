@@ -14,7 +14,7 @@ public class Pin extends ListenerAdapter {
         Message msg = event.getMessage();
         TextChannel channel = event.getTextChannel();
 
-        if (msg.getContentRaw().toLowerCase().startsWith("-pin")) {
+        if (msg.getContentRaw().toLowerCase().startsWith("-pin ")) {
                 String[] parsedMessage = msg.getContentRaw().split("\\s+");
                 try {
                     List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
