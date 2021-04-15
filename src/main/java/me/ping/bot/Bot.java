@@ -1,6 +1,5 @@
 package me.ping.bot;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ping.bot.commands.*;
 import me.ping.bot.core.Heartbeat;
 import me.ping.bot.listeners.Points;
@@ -30,7 +29,8 @@ public class Bot {
                             new RemindMe(),
                             new Pfp(),
                             new Pin(),
-                            new Points()
+                            new Points(),
+                            new Flip()
                     )
                     .build();
             return api;

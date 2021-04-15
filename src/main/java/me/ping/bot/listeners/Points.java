@@ -27,6 +27,7 @@ public class Points extends ListenerAdapter {
             stmt.setLong(1, event.getAuthor().getIdLong());
             ResultSet rs = stmt.executeQuery();
             points = rs.getLong("points");
+            String user_id = event.getJDA().retrieveUserById(rs.getLong("user_id_")).complete().getName();
             connection.close();
 
             event.getChannel().sendMessage("You have " + points + " points").queue();
