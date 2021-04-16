@@ -1,5 +1,6 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.StringUtils;
 import me.ping.bot.core.UserCommandTime;
 import me.ping.bot.exceptions.InvalidTimeDurationException;
 import me.ping.bot.exceptions.InvalidTimeUnitException;
@@ -26,7 +27,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme")) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-remindme")) {
             handleRemindMeCmd(event);
         }
     }
