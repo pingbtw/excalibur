@@ -24,7 +24,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme ")) {
+        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme")) {
             handleRemindMeCmd(event);
         }
     }
@@ -34,15 +34,18 @@ public class RemindMe extends ListenerAdapter {
         Long uid = event.getAuthor().getIdLong();
         long channelId = event.getChannel().getIdLong();
         long serverId = event.getGuild().getIdLong();
-        String reminder = msg.getContentRaw().substring("-remindme ".length());
+        String reminder = "";
 
         try {
+            reminder = msg.getContentRaw().substring("-remindme ".length());
             userCommandTime = new UserCommandTime(reminder);
         } catch (
                 InvalidTimeDurationException |
-                InvalidTimeUnitException |
-                StringIndexOutOfBoundsException e) {
+                        InvalidTimeUnitException e) {
             returnError(event.getChannel(), e.getMessage());
+            return;
+        } catch (StringIndexOutOfBoundsException e) {
+            returnError(event.getChannel(), "");
             return;
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +63,8 @@ public class RemindMe extends ListenerAdapter {
     }
 
     private void returnError(MessageChannel channel, String message) {
-        channel.sendMessage(message + "\nUsage: -remindme <5s|m|h|d> <message to be reminded of>").queue();
+        String format = String.join("|", UserCommandTime.UNITS);
+        channel.sendMessage(message + "\nUsage: -remindme <5" + format + "> <message to be reminded of>").queue();
     }
 
     private void setReminder(
