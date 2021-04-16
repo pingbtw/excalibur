@@ -21,7 +21,6 @@ public class Points extends ListenerAdapter {
     }
 
     public void getUserPoints(MessageReceivedEvent event) {
-        Connection connection;
         long points = 0;
         try {
             DbHandler db = DbHandler.getInstance();
@@ -44,7 +43,6 @@ public class Points extends ListenerAdapter {
     }
 
     public void insertIntoPointsTable(MessageReceivedEvent event) {
-        Connection connection;
         long serverId = event.getGuild().getIdLong();
         long userId = event.getAuthor().getIdLong();
         int points = calculatePointsToAward(event);
