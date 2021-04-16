@@ -24,7 +24,7 @@ public class RemindMe extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return;
         }
-        if (event.getMessage().getContentRaw().toLowerCase().startsWith("-remindme")) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-remindme")) {
             handleRemindMeCmd(event);
         }
     }

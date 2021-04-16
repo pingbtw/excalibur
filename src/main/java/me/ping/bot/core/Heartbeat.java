@@ -1,16 +1,19 @@
 package me.ping.bot.core;
 
+import me.ping.bot.exceptions.InvalidDataTypeException;
+import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.JDA;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.*;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class Heartbeat implements Runnable {
     private final int HEARTBEAT_INTERVAL = 1;
@@ -19,8 +22,6 @@ public class Heartbeat implements Runnable {
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     private JDA jda;
-    private Connection connection;
-
 
     public Heartbeat(JDA jda) {
         this.jda = jda;
@@ -39,43 +40,33 @@ public class Heartbeat implements Runnable {
 
     private void checkDatabaseForReminder() {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-
+            DbHandler db = DbHandler.getInstance();
             String sql = "SELECT * FROM reminders WHERE reminder_time<?";
             long now = new Date().getTime();
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setLong(1, now);
-            ResultSet rs = stmt.executeQuery();
+            try {
+                QueryResult qr = db.select(sql, now);
+                if(qr.hasResultSet()) {
+                    ResultSet rs = qr.getRs();
+                    while(rs.next()) {
+                        long uid = rs.getLong("user_id");
+                        long serverId = rs.getLong("server_id");
+                        long channelId = rs.getLong("channel_id");
+                        String reminder = rs.getString("reminder");
+                        long reminderTime = rs.getLong("reminder_time");
+                        int recordId = rs.getInt("id");
 
-            while (rs.next()) {
-                long uid = rs.getLong("user_id");
-                long serverId = rs.getLong("server_id");
-                long channelId = rs.getLong("channel_id");
-                String reminder = rs.getString("reminder");
-                long reminderTime = rs.getLong("reminder_time");
-                int recordId = rs.getInt("id");
-                //server_id, channel_id, user_id, reminder, reminder_time
+                        db.delete("DELETE FROM reminders WHERE id=?", recordId);
 
-                stmt = connection.prepareStatement("DELETE FROM reminders WHERE id=?");
-                stmt.setInt(1, recordId);
-                stmt.execute();
-                if (stmt.getUpdateCount() > 0) {
-
+                        dispatchReminder(serverId, channelId, uid, reminder);
+                    }
+                    qr.close();
+                    db.close();
                 }
-
-                dispatchReminder(serverId, channelId, uid, reminder);
-
+            } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+                e.printStackTrace();
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-        } finally {
-            try {
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
         }
     }
 
@@ -91,12 +82,7 @@ public class Heartbeat implements Runnable {
             System.out.println(e);
             System.out.println("---EXCEPTION---");
             System.out.println("Something went wrong while trying to dispatch this reminder");
-            /*
-            System.out.println("server id: " + serverId);
-            System.out.println("chan   id: " + channelId);
-            System.out.println("user   id: " + userId);
-            System.out.println("reminder : " + reminder);
-            */
+            System.out.println(e.getMessage());
             System.out.println("---END EXCEPTION---");
 
         }

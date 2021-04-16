@@ -1,20 +1,19 @@
 package me.ping.bot;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import me.ping.bot.commands.*;
+import me.ping.bot.core.DbHandler;
 import me.ping.bot.core.Heartbeat;
+import me.ping.bot.exceptions.InvalidDataTypeException;
+import me.ping.bot.exceptions.ParameterCountMismatchException;
 import me.ping.bot.listeners.Points;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-
-import java.sql.*;
 
 public class Bot {
     public static void main(String[] args) throws Exception {
         Bot bot = new Bot();
         JDA jda = bot.prepareJDA();
         bot.prepareDatabase();
-
         new Heartbeat(jda);
     }
 
@@ -30,7 +29,8 @@ public class Bot {
                             new RemindMe(),
                             new Pfp(),
                             new Pin(),
-                            new Points()
+                            new Points(),
+                            new Flip()
                     )
                     .build();
             return api;
@@ -43,23 +43,14 @@ public class Bot {
 
     // this wont create anything if it exists already
     private void prepareDatabase() {
-        Connection connection = null;
+        DbHandler db = DbHandler.getInstance();
+
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS points (id INTEGER PRIMARY KEY, server_id INTEGER, user_id INTEGER, points INTEGER)");
-            connection.commit();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            try {
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
+            db.create("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
+            db.create("CREATE TABLE IF NOT EXISTS points (id INTEGER PRIMARY KEY, server_id INTEGER, user_id INTEGER UNIQUE, points INTEGER)");
+        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            e.printStackTrace();
         }
+        db.close();
     }
 }

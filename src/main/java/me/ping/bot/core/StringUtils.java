@@ -1,6 +1,16 @@
 package me.ping.bot.core;
 
 public class StringUtils {
+
+    public static int countMatches(String str, String find) {
+        int count = 0, fromIndex = 0;
+        while ((fromIndex = str.indexOf(find, fromIndex)) != -1 ){
+            count++;
+            fromIndex++;
+        }
+        return count;
+    }
+
     public static String removePrefix(final String text, String prefix) {
         if (isEmpty(text)) {
             return "";

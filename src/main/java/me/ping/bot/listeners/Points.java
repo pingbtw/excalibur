@@ -1,12 +1,16 @@
 package me.ping.bot.listeners;
 
-import net.dv8tion.jda.api.entities.Invite;
+import me.ping.bot.core.DbHandler;
+import me.ping.bot.core.QueryResult;
+import me.ping.bot.exceptions.InvalidDataTypeException;
+import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Points extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -16,26 +20,27 @@ public class Points extends ListenerAdapter {
         }
     }
 
-    public long getUserPoints(MessageReceivedEvent event) {
+    public void getUserPoints(MessageReceivedEvent event) {
         Connection connection;
         long points = 0;
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-
-            String sql = "SELECT * FROM points WHERE user_id = ?";
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setLong(1, event.getAuthor().getIdLong());
-            ResultSet rs = stmt.executeQuery();
-            points = rs.getLong("points");
-            connection.close();
-
-            event.getChannel().sendMessage("You have " + points + " points").queue();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            DbHandler db = DbHandler.getInstance();
+            String sql = "SELECT * FROM points WHERE user_id=?";
+            QueryResult qr = db.select(sql, event.getAuthor().getIdLong());
+            if (qr.hasResultSet()) {
+                while (qr.getRs().next()) {
+                    points = qr.getRs().getInt("points");
+                }
+            }
+            qr.close();
+            db.close();
+        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // do nothing jon snow
+            e.printStackTrace();
         }
-        System.out.println(points);
-        return points;
+        event.getChannel().sendMessage("You have " + points + " points").queue();
     }
 
     public void insertIntoPointsTable(MessageReceivedEvent event) {
@@ -45,43 +50,18 @@ public class Points extends ListenerAdapter {
         int points = calculatePointsToAward(event);
         long oldPoints = 0;
 
+        String sql =
+                "INSERT INTO points (user_id, server_id, points) VALUES (?,?,?) " +
+                        "ON CONFLICT(user_id) DO UPDATE SET points = points + ?";
+
+        DbHandler db = DbHandler.getInstance();
+
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-
-            try {
-
-                String sql = "SELECT * FROM points WHERE user_id = ?";
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                stmt.setLong(1, event.getAuthor().getIdLong());
-                ResultSet rs = stmt.executeQuery();
-                oldPoints = rs.getLong("points");
-
-                String sql2 = "UPDATE points SET points = ? WHERE user_id = ?";
-                stmt = connection.prepareStatement(sql2);
-                stmt.setLong(1, points + oldPoints);
-                stmt.setLong(2, userId);
-                stmt.execute();
-                connection.close();
-            } catch (SQLException e) {
-                System.out.println("Adding new user to points table");
-                connection.close();
-
-                connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-
-                String sql = "INSERT INTO points (server_id, user_id, points) VALUES(?,?,?)";
-
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                stmt.setLong(1, serverId);
-                stmt.setLong(2, userId);
-                stmt.setLong(3, points);
-                stmt.execute();
-                stmt.close();
-            }
-
-        } catch (
-                SQLException e) {
-            System.err.println(e.getMessage());
+            db.query(sql, DbHandler.QueryType.INSERT, userId, serverId, points, points);
+        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            e.printStackTrace();
         }
+        db.close();
     }
 
     public int calculatePointsToAward(MessageReceivedEvent event) {
