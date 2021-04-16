@@ -7,12 +7,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.*;
 
 public class Heartbeat implements Runnable {
+    private final int HEARTBEAT_INTERVAL = 1;
+    private final TimeUnit HEARTBEAT_UNIT = MINUTES;
+
     private final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(1);
     private JDA jda;
@@ -25,9 +28,9 @@ public class Heartbeat implements Runnable {
     }
 
     private void start(Runnable r) {
-        Runnable beeper = r;
+        Runnable beat = r;
         ScheduledFuture<?> beeperHandle =
-                scheduler.scheduleAtFixedRate(beeper, 0, 10, SECONDS);
+                scheduler.scheduleAtFixedRate(beat, 0, HEARTBEAT_INTERVAL, HEARTBEAT_UNIT);
     }
 
     public void run() {

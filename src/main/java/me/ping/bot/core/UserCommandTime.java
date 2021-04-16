@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class UserCommandTime {
     public static final long DAYS_LIMIT = 30L;
-    protected String[] units = {"s", "m", "h", "d"};
+    public static final String[] UNITS = {"m", "h", "d"};
     private String unitStr;
     private long duration;
     private TimeUnit unit;
@@ -58,7 +58,7 @@ public class UserCommandTime {
     private String extractTimeUnit(String time) {
         try {
             String unit = Character.toString(time.charAt(time.length() - 1));
-            boolean contains = Arrays.stream(units).anyMatch(unit::equalsIgnoreCase);
+            boolean contains = Arrays.stream(UNITS).anyMatch(unit::equalsIgnoreCase);
 
             if (contains) {
                 return unit;
