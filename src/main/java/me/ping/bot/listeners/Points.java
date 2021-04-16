@@ -5,11 +5,9 @@ import me.ping.bot.core.QueryResult;
 import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Points extends ListenerAdapter {

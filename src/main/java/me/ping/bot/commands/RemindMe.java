@@ -1,24 +1,22 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.DbHandler;
+import me.ping.bot.core.QueryResult;
 import me.ping.bot.core.StringUtils;
 import me.ping.bot.core.UserCommandTime;
+import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.InvalidTimeDurationException;
 import me.ping.bot.exceptions.InvalidTimeUnitException;
-import net.dv8tion.jda.api.JDA;
+import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.sql.*;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RemindMe extends ListenerAdapter {
-    private Connection connection;
     private UserCommandTime userCommandTime;
 
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -80,30 +78,18 @@ public class RemindMe extends ListenerAdapter {
         long currentTimeMs = new Date().getTime();
         long reminderTime = currentTimeMs + durationMs;
 
+        String sql =
+                "INSERT INTO reminders (server_id, channel_id, user_id, "+
+                        "reminder, reminder_time) VALUES(?,?,?,?,?)";
+
+        DbHandler db = DbHandler.getInstance();
+
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
-
-            String sql = "INSERT INTO reminders (server_id, channel_id, user_id, reminder, reminder_time) VALUES(?,?,?,?,?)";
-
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setLong(1, serverId);
-            stmt.setLong(2, channelId);
-            stmt.setLong(3, userId);
-            stmt.setString(4, reminder);
-            stmt.setLong(5, reminderTime);
-            stmt.execute();
-
-        } catch (
-                SQLException e) {
-            System.err.println(e.getMessage());
-        } finally {
-            try {
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
+            QueryResult qr = db.insert(sql, serverId, channelId, userId, reminder, reminderTime);
+            qr.close();
+            db.close();
+        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            e.printStackTrace();
         }
     }
 

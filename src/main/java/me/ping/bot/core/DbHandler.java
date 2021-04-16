@@ -4,6 +4,7 @@ import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DbHandler {
     public static enum QueryType {
@@ -25,6 +26,7 @@ public class DbHandler {
     private void openConnection() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:excalibur.db");
+            connection.setAutoCommit(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -65,15 +67,16 @@ public class DbHandler {
             stmt = connection.prepareStatement(query);
             for (int i = 0; i < params.length; i++) {
                 if (params[i] instanceof Integer)
-                    stmt.setInt(i + 1, (Integer) params[i]);
+                    stmt.setInt(i + 1, (int) params[i]);
                 else if (params[i] instanceof String)
                     stmt.setString(i + 1, (String) params[i]);
                 else if (params[i] instanceof Double)
-                    stmt.setDouble(i + 1, (Double) params[i]);
+                    stmt.setDouble(i + 1, (double) params[i]);
                 else if (params[i] instanceof Float)
-                    stmt.setFloat(i + 1, (Float) params[i]);
-                else if (params[i] instanceof Long)
-                    stmt.setLong(i + 1, (Long) params[i]);
+                    stmt.setFloat(i + 1, (float) params[i]);
+                else if (params[i] instanceof Long) {
+                    stmt.setLong(i + 1, (long) params[i]);
+                }
                 else
                     throw new InvalidDataTypeException("Unknown data type for query at parameter " + (i + 2));
             }
@@ -102,10 +105,18 @@ public class DbHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return queryResult;
     }
 
+    public void setAutoCommit(boolean state) {
+        if(connection != null) {
+            try {
+                connection.setAutoCommit(state);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public void close() {
         try {
             if (connection != null) {
@@ -141,5 +152,29 @@ public class DbHandler {
     public QueryResult create(String query, Object... params)
             throws InvalidDataTypeException, ParameterCountMismatchException {
         return query(query, QueryType.CREATE, params);
+    }
+
+    public void deleteMultiple(String query, ArrayList<Integer> ids) {
+        try {
+            if(connection == null)
+                openConnection();
+
+            if(ids.size() == 0) {
+                System.out.println("returning");
+                return;
+            }
+
+            setAutoCommit(false);
+            PreparedStatement stmt = connection.prepareStatement(query);
+            for(int id : ids){
+                System.out.println("deleting id: " + id);
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+            }
+            connection.commit();
+            setAutoCommit(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
