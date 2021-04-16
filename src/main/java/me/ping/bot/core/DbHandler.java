@@ -167,7 +167,6 @@ public class DbHandler {
             setAutoCommit(false);
             PreparedStatement stmt = connection.prepareStatement(query);
             for(int id : ids){
-                System.out.println("deleting id: " + id);
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
             }

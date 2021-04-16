@@ -16,8 +16,8 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Heartbeat implements Runnable {
-    private final int HEARTBEAT_INTERVAL = 1;
-    private final TimeUnit HEARTBEAT_UNIT = MINUTES;
+    private final int HEARTBEAT_INTERVAL = 60;
+    private final TimeUnit HEARTBEAT_UNIT = SECONDS;
 
     private ArrayList<Reminder> reminderQueue;
 
@@ -34,7 +34,7 @@ public class Heartbeat implements Runnable {
     private void start(Runnable r) {
         Runnable beat = r;
         ScheduledFuture<?> handle =
-                scheduler.scheduleAtFixedRate(beat, 0, HEARTBEAT_INTERVAL, HEARTBEAT_UNIT);
+                scheduler.scheduleAtFixedRate(beat, 30, HEARTBEAT_INTERVAL, HEARTBEAT_UNIT);
     }
 
     public void run() {
