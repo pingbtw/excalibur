@@ -4,10 +4,7 @@ import me.ping.bot.core.DbHandler;
 import me.ping.bot.core.QueryResult;
 import me.ping.bot.core.StringUtils;
 import me.ping.bot.core.UserCommandTime;
-import me.ping.bot.exceptions.InvalidDataTypeException;
-import me.ping.bot.exceptions.InvalidTimeDurationException;
-import me.ping.bot.exceptions.InvalidTimeUnitException;
-import me.ping.bot.exceptions.ParameterCountMismatchException;
+import me.ping.bot.exceptions.*;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -88,7 +85,7 @@ public class RemindMe extends ListenerAdapter {
             QueryResult qr = db.insert(sql, serverId, channelId, userId, reminder, reminderTime);
             qr.close();
             db.close();
-        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+        } catch (InvalidDataTypeException | DuplicateKeyException |  ParameterCountMismatchException e) {
             e.printStackTrace();
         }
     }

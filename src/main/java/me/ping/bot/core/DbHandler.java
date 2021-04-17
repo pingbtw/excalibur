@@ -1,5 +1,6 @@
 package me.ping.bot.core;
 
+import me.ping.bot.exceptions.DuplicateKeyException;
 import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 
@@ -51,7 +52,7 @@ public class DbHandler {
      * after we handle the result.
      */
     public QueryResult query(String query, QueryType type, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
 
         int expectedParams = StringUtils.countMatches(query, "?");
 
@@ -101,7 +102,13 @@ public class DbHandler {
                 queryResult = new QueryResult(rs, true, 0);
             }
         } catch (SQLException e) {
+            if(e.getMessage().contains("SQLITE_CONSTRAINT_PRIMARYKEY")) {
+                throw new DuplicateKeyException(e.getMessage());
+            }
             e.printStackTrace();
+            System.out.println(e.getSQLState());
+            System.out.println(e.getMessage());
+            System.out.println(e.getLocalizedMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,27 +137,27 @@ public class DbHandler {
 
     // convenience methods
     public QueryResult select(String query, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
         return query(query, QueryType.SELECT, params);
     }
 
     public QueryResult update(String query, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
         return query(query, QueryType.UPDATE, params);
     }
 
     public QueryResult insert(String query, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
         return query(query, QueryType.INSERT, params);
     }
 
     public QueryResult delete(String query, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
         return query(query, QueryType.DELETE, params);
     }
 
     public QueryResult create(String query, Object... params)
-            throws InvalidDataTypeException, ParameterCountMismatchException {
+            throws InvalidDataTypeException, ParameterCountMismatchException, DuplicateKeyException {
         return query(query, QueryType.CREATE, params);
     }
 
@@ -160,7 +167,6 @@ public class DbHandler {
                 openConnection();
 
             if(ids.size() == 0) {
-                System.out.println("returning");
                 return;
             }
 

@@ -4,3 +4,5 @@ build/
 dev.env
 excalibur.db
 **/.DS_Store
+excalibur_settings.conf
+error_log

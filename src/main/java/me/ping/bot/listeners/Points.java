@@ -3,16 +3,15 @@ package me.ping.bot.listeners;
 import me.ping.bot.core.DbHandler;
 import me.ping.bot.core.QueryResult;
 import me.ping.bot.core.StringUtils;
+import me.ping.bot.exceptions.DuplicateKeyException;
 import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class Points extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -41,7 +40,7 @@ public class Points extends ListenerAdapter {
             }
             qr.close();
             db.close();
-        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+        } catch (InvalidDataTypeException | DuplicateKeyException |  ParameterCountMismatchException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             // do nothing jon snow
@@ -63,7 +62,7 @@ public class Points extends ListenerAdapter {
             }
             qr.close();
             db.close();
-        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+        } catch (InvalidDataTypeException |DuplicateKeyException |  ParameterCountMismatchException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             // do nothing jon snow
@@ -86,7 +85,7 @@ public class Points extends ListenerAdapter {
 
         try {
             db.query(sql, DbHandler.QueryType.INSERT, userId, serverId, points, points);
-        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+        } catch (InvalidDataTypeException | DuplicateKeyException |  ParameterCountMismatchException e) {
             e.printStackTrace();
         }
         db.close();
