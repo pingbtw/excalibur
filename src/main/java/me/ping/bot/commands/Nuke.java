@@ -18,7 +18,6 @@ public class Nuke extends ListenerAdapter {
         Member member;
 
         if (msg.getContentRaw().toLowerCase().startsWith("-nuke")) {
-            //if (msg.getAuthor().getId().equals("") || msg.getAuthor().getId().equals("")) {
             if(event.getMember().getPermissions().contains(Permission.ADMINISTRATOR)){
                 String[] numberToNuke = msg.getContentRaw().split("\\s+");
                 if (Integer.parseInt(numberToNuke[1]) < 50) {
