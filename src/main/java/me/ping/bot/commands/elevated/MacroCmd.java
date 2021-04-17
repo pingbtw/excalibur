@@ -8,9 +8,28 @@ import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.Arrays;
+
 public class MacroCmd {
     private Settings settings;
     private final String addUsage, removeUsage, editUsage;
+    private final String[] protectedMacros = {
+            "addrole",
+            "removerole",
+            "roles",
+            "prefix",
+            "embedcolor",
+            "addmacro",
+            "editmacro",
+            "removemacro",
+            "flip",
+            "mute",
+            "nuke",
+            "pfp",
+            "pin",
+            "ping",
+            "remindme"
+    };
 
     public MacroCmd() {
         this.settings = Settings.getInstance();
@@ -55,6 +74,13 @@ public class MacroCmd {
         if (macroName == null) {
             event.getChannel().sendMessage(addUsage).queue();
         } else {
+            boolean contains = Arrays.stream(protectedMacros).anyMatch(macroName::equalsIgnoreCase);
+
+            if(contains) {
+                event.getChannel().sendMessage("Cannot create macro with keyword: **" + macroName +"**").queue();
+                return;
+            }
+
             macroContent = macroContent.replaceFirst(macroName, "").trim();
             DbHandler db = DbHandler.getInstance();
 
