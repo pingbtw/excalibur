@@ -18,7 +18,9 @@ public class Bot {
     }
 
     private JDA prepareJDA() {
-        String token = "";
+
+        String token = System.getenv("TOKEN");
+        System.out.println(token);
         JDA api;
         try {
             api = JDABuilder.createDefault(token)
