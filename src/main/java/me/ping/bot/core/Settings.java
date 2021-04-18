@@ -12,11 +12,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Settings {
-    private static Settings settings = null;
+    public static Settings settings = null;
 
     private final String path;
     private ArrayList<Long> roleIds;
-    private String embedColor = "#FF0000", cmdPrefix = "x!";
+    private String embedColor = "#FF0000", cmdPrefix = "-";
 
     public static Settings getInstance() {
         if (settings == null)
@@ -24,7 +24,7 @@ public class Settings {
         return settings;
     }
 
-    private Settings() {
+    public Settings() {
         path = System.getProperty("user.dir") + System.getProperty("file.separator") + "excalibur_settings.conf";
         roleIds = new ArrayList<Long>();
         roleIds.add(1000L);
@@ -57,7 +57,7 @@ public class Settings {
         }
     }
 
-    private void createSettingsFile(String path) {
+    public void createSettingsFile(String path) {
 
         File file = new File(path);
         try {
@@ -75,7 +75,7 @@ public class Settings {
         }
     }
 
-    private void updateSettings() {
+    public void updateSettings() {
         try {
             JSONArray roles = new JSONArray();
             for (int i = 0; i < this.roleIds.size(); i++) {

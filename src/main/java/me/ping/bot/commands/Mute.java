@@ -1,5 +1,7 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.Settings;
+import me.ping.bot.core.StringUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,7 +13,8 @@ public class Mute extends ListenerAdapter {
         Message msg = event.getMessage();
         Guild guild = event.getGuild();
         MessageChannel channel = event.getChannel();
-        if (msg.getContentRaw().toLowerCase().startsWith("-mute")) {
+        Settings settings = new Settings();
+        if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "mute") ) {
             List<Member> memberToMute = event.getMessage().getMentionedMembers();
             Role memberRole = event.getMember().getRoles().stream().filter(role -> role.getName().equals("moterator")).findFirst().orElse(null);
             if (memberRole != null) {
