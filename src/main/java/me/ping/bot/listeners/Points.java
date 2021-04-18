@@ -2,6 +2,7 @@ package me.ping.bot.listeners;
 
 import me.ping.bot.core.DbHandler;
 import me.ping.bot.core.QueryResult;
+import me.ping.bot.core.Settings;
 import me.ping.bot.core.StringUtils;
 import me.ping.bot.exceptions.DuplicateKeyException;
 import me.ping.bot.exceptions.InvalidDataTypeException;
@@ -16,7 +17,8 @@ import java.sql.SQLException;
 public class Points extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         insertIntoPointsTable(event);
-        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), "-points")) {
+        Settings settings = new Settings();
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "points") ) {
             if (event.getMessage().getMentionedMembers().size() > 1) {
                 event.getChannel().sendMessage("Too many users provided").queue();
             } else if (event.getMessage().getMentionedMembers().isEmpty()) {

@@ -1,5 +1,7 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.Settings;
+import me.ping.bot.core.StringUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -16,8 +18,9 @@ public class Nuke extends ListenerAdapter {
         Guild guild = event.getGuild();
         MessageChannel channel = event.getChannel();
         Member member;
+        Settings settings = new Settings();
 
-        if (msg.getContentRaw().toLowerCase().startsWith("-nuke")) {
+        if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "nuke") ) {
             if(event.getMember().getPermissions().contains(Permission.ADMINISTRATOR)){
                 String[] numberToNuke = msg.getContentRaw().split("\\s+");
                 if (Integer.parseInt(numberToNuke[1]) < 50) {

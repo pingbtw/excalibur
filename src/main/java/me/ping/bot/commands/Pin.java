@@ -1,5 +1,7 @@
 package me.ping.bot.commands;
 
+import me.ping.bot.core.Settings;
+import me.ping.bot.core.StringUtils;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,7 +15,8 @@ public class Pin extends ListenerAdapter {
         Message msg = event.getMessage();
         TextChannel channel = event.getTextChannel();
 
-        if (msg.getContentRaw().toLowerCase().startsWith("-pin ")) {
+        Settings settings = new Settings();
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pin") ) {
             String[] parsedMessage = msg.getContentRaw().split("\\s+");
             try {
                 List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
