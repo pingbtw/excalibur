@@ -13,20 +13,12 @@ import net.dv8tion.jda.api.JDABuilder;
 
 import javax.crypto.Mac;
 
-// TODO: get Settings.getInstance() in all listener classes
-// TODO: replace hard coded prefix (-) with settings.getCmdPrefix()
 public class Bot {
     public static void main(String[] args) throws Exception {
         Bot bot = new Bot();
         JDA jda = bot.prepareJDA();
         bot.prepareDatabase();
         new Heartbeat(jda);
-//        Settings s = Settings.getInstance();
-//        s.loadSettings();
-//        System.out.println(s.getCmdPrefix());
-//        System.out.println(s.getCmdPrefixSeparator());
-//        System.out.println(s.getEmbedColor());
-//        System.out.println(s.getRoleIdsAsString());
     }
 
     private JDA prepareJDA() {
