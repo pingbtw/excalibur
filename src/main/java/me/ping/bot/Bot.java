@@ -1,20 +1,32 @@
 package me.ping.bot;
 
 import me.ping.bot.commands.*;
+import me.ping.bot.commands.elevated.ElevatedListener;
 import me.ping.bot.core.DbHandler;
 import me.ping.bot.core.Heartbeat;
+import me.ping.bot.exceptions.DuplicateKeyException;
 import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import me.ping.bot.listeners.Points;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
+import javax.crypto.Mac;
+
+// TODO: get Settings.getInstance() in all listener classes
+// TODO: replace hard coded prefix (-) with settings.getCmdPrefix()
 public class Bot {
     public static void main(String[] args) throws Exception {
         Bot bot = new Bot();
         JDA jda = bot.prepareJDA();
         bot.prepareDatabase();
         new Heartbeat(jda);
+//        Settings s = Settings.getInstance();
+//        s.loadSettings();
+//        System.out.println(s.getCmdPrefix());
+//        System.out.println(s.getCmdPrefixSeparator());
+//        System.out.println(s.getEmbedColor());
+//        System.out.println(s.getRoleIdsAsString());
     }
 
     private JDA prepareJDA() {
@@ -32,7 +44,9 @@ public class Bot {
                             new Pfp(),
                             new Pin(),
                             new Points(),
-                            new Flip()
+                            new Flip(),
+                            new ElevatedListener(),
+                            new Macro()
                     )
                     .build();
             return api;
@@ -50,7 +64,8 @@ public class Bot {
         try {
             db.create("CREATE TABLE IF NOT EXISTS reminders (id INTEGER PRIMARY KEY, server_id INTEGER, channel_id INTEGER, user_id INTEGER, reminder TEXT, reminder_time INTEGER)");
             db.create("CREATE TABLE IF NOT EXISTS points (id INTEGER PRIMARY KEY, server_id INTEGER, user_id INTEGER UNIQUE, points INTEGER)");
-        } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            db.create("CREATE TABLE IF NOT EXISTS macros (command TEXT PRIMARY KEY, content TEXT, server_id INTEGER, user_id INTEGER)");
+        } catch (InvalidDataTypeException | DuplicateKeyException |  ParameterCountMismatchException e) {
             e.printStackTrace();
         }
         db.close();

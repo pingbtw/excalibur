@@ -1,6 +1,7 @@
 package me.ping.bot.core;
 
 import me.ping.bot.classes.Reminder;
+import me.ping.bot.exceptions.DuplicateKeyException;
 import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.JDA;
@@ -12,7 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Heartbeat implements Runnable {
@@ -64,7 +64,7 @@ public class Heartbeat implements Runnable {
                     db.close();
                     dispatchReminders();
                 }
-            } catch (InvalidDataTypeException | ParameterCountMismatchException e) {
+            } catch (InvalidDataTypeException | DuplicateKeyException | ParameterCountMismatchException e) {
                 e.printStackTrace();
             }
         } catch (SQLException e) {

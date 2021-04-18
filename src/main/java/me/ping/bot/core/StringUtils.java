@@ -1,6 +1,23 @@
 package me.ping.bot.core;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringUtils {
+    private static final Pattern HEX_PATTERN = Pattern.compile("^#([A-Fa-f0-9]{6})$");
+
+    public static boolean validateHexCode(String hex) {
+        Matcher matcher = HEX_PATTERN.matcher(hex);
+        return matcher.matches();
+    }
+
+    public static boolean hasCommand(String cmd, String str, boolean hasArgs) {
+        if(hasArgs) {
+            return str.toLowerCase().startsWith(cmd);
+        } else {
+            return str.equalsIgnoreCase(cmd);
+        }
+    }
 
     public static int countMatches(String str, String find) {
         int count = 0, fromIndex = 0;
