@@ -16,7 +16,7 @@ public class Pin extends ListenerAdapter {
         TextChannel channel = event.getTextChannel();
 
         Settings settings = new Settings();
-        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pin") ) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pin ") ) {
             String[] parsedMessage = msg.getContentRaw().split("\\s+");
             try {
                 List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
