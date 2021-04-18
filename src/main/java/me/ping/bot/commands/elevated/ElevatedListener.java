@@ -49,7 +49,7 @@ public class ElevatedListener extends ListenerAdapter {
         boolean hasRole = memberRoles.stream()
                 .anyMatch(r -> settings.getRoleIds().contains(r.getIdLong()));
 
-        if (perms.contains(Permission.ADMINISTRATOR) || hasRole) {
+        if (perms.contains(Permission.MANAGE_CHANNEL) || hasRole) {
             if (msg.equalsIgnoreCase(settings.getCmdPrefix() + "help")) {
                 buildHelpEmbed();
                 event.getChannel().sendMessage(helpEmbed.build()).queue();
