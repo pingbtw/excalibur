@@ -79,6 +79,9 @@ public class ElevatedListener extends ListenerAdapter {
             if (StringUtils.hasCommand(prefix + "editmacro", msg, true)) {
                 macroCmd.editMacro(event);
             }
+            if (StringUtils.hasCommand(prefix + "macros", msg, false)) {
+                macroCmd.listAllMacros(event);
+            }
         }
     }
 

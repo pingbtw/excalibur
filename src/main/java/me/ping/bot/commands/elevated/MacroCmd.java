@@ -8,6 +8,7 @@ import me.ping.bot.exceptions.InvalidDataTypeException;
 import me.ping.bot.exceptions.ParameterCountMismatchException;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public class MacroCmd {
@@ -67,7 +68,8 @@ public class MacroCmd {
             // get macro name from entire message, starting after
             // the command
             macroName = extractMacroName(macroContent);
-        } catch (StringIndexOutOfBoundsException e) {
+            macroName = (macroName.startsWith(settings.getCmdPrefix())) ? macroName.replaceFirst(settings.getCmdPrefix(), "") : macroName;
+        } catch (StringIndexOutOfBoundsException | NullPointerException e) {
             event.getChannel().sendMessage(addUsage).queue();
             return;
         }
@@ -106,14 +108,17 @@ public class MacroCmd {
         String macroName = null;
         String[] parts = msg.split(" ");
         if (parts.length == 2) {
+            macroName = parts[1];
+            macroName = (macroName.startsWith(settings.getCmdPrefix())) ? macroName.replaceFirst(settings.getCmdPrefix(), "") : macroName;
+
             DbHandler db = DbHandler.getInstance();
             String sql = "DELETE FROM macros WHERE command=?";
             try {
-                QueryResult qr = db.delete(sql, parts[1]);
+                QueryResult qr = db.delete(sql, macroName);
                 if (qr.getAffectedRows() > 0)
-                    event.getChannel().sendMessage("Macro **" + parts[1] + "** removed.").queue();
+                    event.getChannel().sendMessage("Macro **" + macroName + "** removed.").queue();
                 else
-                    event.getChannel().sendMessage("Macro **" + parts[1] + "** not found.").queue();
+                    event.getChannel().sendMessage("Macro **" + macroName + "** not found.").queue();
             } catch (InvalidDataTypeException | ParameterCountMismatchException | DuplicateKeyException e) {
                 e.printStackTrace();
             }
@@ -132,7 +137,8 @@ public class MacroCmd {
             // get macro name from entire message, starting after
             // the command
             macroName = extractMacroName(macroContent);
-        } catch (StringIndexOutOfBoundsException e) {
+            macroName = (macroName.startsWith(settings.getCmdPrefix())) ? macroName.replaceFirst(settings.getCmdPrefix(), "") : macroName;
+        } catch (StringIndexOutOfBoundsException | NullPointerException e) {
             event.getChannel().sendMessage(addUsage).queue();
             return;
         }
@@ -156,6 +162,30 @@ public class MacroCmd {
             } catch (InvalidDataTypeException | DuplicateKeyException | ParameterCountMismatchException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void listAllMacros(MessageReceivedEvent event) {
+        try {
+            StringBuilder macros = new StringBuilder();
+            DbHandler db = DbHandler.getInstance();
+            QueryResult qr = db.select("SELECT command FROM macros");
+
+            if(qr.hasResultSet()) {
+                if(qr.getRs().next()) {
+                    macros.append(settings.getCmdPrefix()).append(qr.getRs().getString("command"));
+                }
+                while (qr.getRs().next()) {
+                    macros.append(", ").append(settings.getCmdPrefix()).append(qr.getRs().getString("command"));
+                }
+                event.getChannel().sendMessage(macros).queue();
+            } else {
+                event.getChannel().sendMessage("No macros found.").queue();
+            }
+            qr.close();
+            db.close();
+        } catch (InvalidDataTypeException | DuplicateKeyException | ParameterCountMismatchException | SQLException e) {
+            e.printStackTrace();
         }
     }
 
