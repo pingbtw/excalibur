@@ -20,7 +20,7 @@ public class Nuke extends ListenerAdapter {
         if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "nuke") ) {
             if(event.getMember().getPermissions().contains(Permission.MANAGE_CHANNEL)){
                 String[] numberToNuke = msg.getContentRaw().split("\\s+");
-                if (Integer.parseInt(numberToNuke[1]) < 50) {
+                if (Integer.parseInt(numberToNuke[1]) <= 50) {
                     List<Message> messages = channel.getHistory().retrievePast(Integer.parseInt(numberToNuke[1])).complete();
                     messages.removeIf(m-> {
                         List<MessageReaction> reactions = m.getReactions();
