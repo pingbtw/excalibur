@@ -9,12 +9,17 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.List;
 
 public class Mute extends ListenerAdapter {
+    private Settings settings;
+
+    public Mute() {
+        this.settings = Settings.getInstance();
+    }
+
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
         Guild guild = event.getGuild();
         MessageChannel channel = event.getChannel();
-        Settings settings = new Settings();
-        if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "mute") ) {
+        if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "mute")) {
             List<Member> memberToMute = event.getMessage().getMentionedMembers();
             Role memberRole = event.getMember().getRoles().stream().filter(role -> role.getName().equals("moterator")).findFirst().orElse(null);
             if (memberRole != null) {

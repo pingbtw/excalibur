@@ -10,9 +10,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.time.temporal.ChronoUnit;
 
 public class Ping extends ListenerAdapter {
+    private Settings settings;
+
+    public Ping() {
+        this.settings = Settings.getInstance();
+    }
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
-        Settings settings = new Settings();
         if (StringUtils.startsWithIgnoreCase(msg.getContentRaw(), settings.getCmdPrefix() + "ping") ) {
             long ping = event.getMessage().getTimeCreated().until(msg.getTimeCreated(), ChronoUnit.MILLIS);
             MessageChannel channel = event.getChannel();

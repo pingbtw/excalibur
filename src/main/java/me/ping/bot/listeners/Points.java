@@ -15,9 +15,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.sql.SQLException;
 
 public class Points extends ListenerAdapter {
+    private Settings settings;
+
+    public Points() {
+        this.settings = Settings.getInstance();
+    }
     public void onMessageReceived(MessageReceivedEvent event) {
         insertIntoPointsTable(event);
-        Settings settings = new Settings();
         if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "points") ) {
             if (event.getMessage().getMentionedMembers().size() > 1) {
                 event.getChannel().sendMessage("Too many users provided").queue();

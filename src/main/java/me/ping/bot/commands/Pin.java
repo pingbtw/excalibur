@@ -11,12 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pin extends ListenerAdapter {
+    private Settings settings;
+
+    public Pin() {
+        this.settings = Settings.getInstance();
+    }
+
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
         TextChannel channel = event.getTextChannel();
 
-        Settings settings = new Settings();
-        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pin ") ) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pin ")) {
             String[] parsedMessage = msg.getContentRaw().split("\\s+");
             try {
                 List<Message> pinnedMesages = new ArrayList<>(channel.retrievePinnedMessages().complete());
