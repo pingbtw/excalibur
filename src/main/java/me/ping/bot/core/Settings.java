@@ -24,11 +24,9 @@ public class Settings {
         return settings;
     }
 
-    public Settings() {
+    private Settings() {
         path = System.getProperty("user.dir") + System.getProperty("file.separator") + "excalibur_settings.conf";
         roleIds = new ArrayList<Long>();
-        roleIds.add(1000L);
-        roleIds.add(2000L);
     }
 
     public void loadSettings() {

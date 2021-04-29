@@ -9,11 +9,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Pfp extends ListenerAdapter {
+    private Settings settings;
+
+    public Pfp() {
+        this.settings = Settings.getInstance();
+    }
+
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
         MessageChannel channel = event.getChannel();
-        Settings settings = new Settings();
-        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pfp") ) {
+        if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "pfp")) {
             if (msg.getMentionedMembers().isEmpty()) {
                 channel.sendMessage("Please provide a user to fetch").queue();
             } else {

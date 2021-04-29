@@ -38,7 +38,10 @@ public class Bot {
                             new Points(),
                             new Flip(),
                             new ElevatedListener(),
-                            new Macro()
+                            new Macro(),
+                            new Reminders(),
+                            new StopRemind(),
+                            new Help()
                     )
                     .build();
             return api;

@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 public class Flip extends ListenerAdapter {
+    private Settings settings;
+
+    public Flip() {
+        this.settings = Settings.getInstance();
+    }
 
     public void onMessageReceived(MessageReceivedEvent event) {
-        Settings settings = new Settings();
         if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "flip") ) {
             List<String> options;
             try {

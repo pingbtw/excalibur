@@ -50,7 +50,7 @@ public class ElevatedListener extends ListenerAdapter {
                 .anyMatch(r -> settings.getRoleIds().contains(r.getIdLong()));
 
         if (perms.contains(Permission.MANAGE_CHANNEL) || hasRole) {
-            if (msg.equalsIgnoreCase(settings.getCmdPrefix() + "help")) {
+            if (msg.equalsIgnoreCase(settings.getCmdPrefix() + "adminhelp")) {
                 buildHelpEmbed();
                 event.getChannel().sendMessage(helpEmbed.build()).queue();
             }

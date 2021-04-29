@@ -11,13 +11,19 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class RemindMe extends ListenerAdapter {
+    private Settings settings;
+
     private UserCommandTime userCommandTime;
+
+    public RemindMe() {
+        this.settings = Settings.getInstance();
+    }
 
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
             return;
         }
-        Settings settings = new Settings();
+
         if (StringUtils.startsWithIgnoreCase(event.getMessage().getContentRaw(), settings.getCmdPrefix() + "remindme") ) {
             handleRemindMeCmd(event);
         }
